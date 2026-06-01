@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elecciones 2026 - Registro de Voto</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Elecciones Ciudadanas</h1>
+      <p>Registra tu preferencia de voto. Recuerda que el voto es único por DNI.</p>
+    </header>
+
+    <main>
+      <form id="vote-form">
+        <div class="form-group">
+          <label for="dni">Número de DNI (8 dígitos):</label>
+          <input type="text" id="dni" name="dni" maxlength="8" pattern="\d{8}" required placeholder="Ej. 12345678" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="voto">Selecciona un partido:</label>
+          <select id="voto" name="voto" required>
+            <option value="" disabled selected>-- Elige una opción --</option>
+            <option value="Partido K">K</option>
+            <option value="Partido PJ">PJ</option>
+
+          </select>
+        </div>
+
+        <button type="submit" id="submit-btn">Registrar Voto</button>
+        <p id="message" class="hidden"></p>
+      </form>
+    </main>
+
+    <aside class="dashboard">
+      <h2>Resultados en Vivo</h2>
+      <p>Total de votos registrados: <strong id="total-votos">0</strong></p>
+      <ul id="lista-resultados"></ul>
+    </aside>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
