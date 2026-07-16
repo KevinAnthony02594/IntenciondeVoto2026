@@ -206,3 +206,44 @@ footer.note{text-align:center;color:#7986a3;font-size:.78rem;margin-top:1.4rem;}
   margin-top:.7rem;background:none;border:0;color:#8b95ad;font-size:.8rem;cursor:pointer;
   text-decoration:underline;font-family:'Inter',sans-serif;
 }
+
+.header-logo{
+    text-align:center;
+    margin:20px 0;
+}
+
+.logo{
+    width:140px;
+    height:auto;
+}
+
+.ticket label{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.candidate-photo{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #ddd;
+    flex-shrink:0;
+}
+
+.candidate-info{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+}
+
+.cand-name{
+    font-weight:bold;
+    font-size:18px;
+}
+
+.cand-party{
+    color:#666;
+    font-size:14px;
+}

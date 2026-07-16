@@ -44,20 +44,35 @@
           <input type="hidden" id="zona" name="zona">
 
           <fieldset id="candidatos">
-            <div class="ticket" style="--tab:#c0392b">
-              <input type="radio" name="voto" id="c1" value="Jorge Vejorano - Avanza país">
-              <label for="c1">
-                <span class="tab"></span>
-                <span class="cand-name">Jorge Vejorano</span>
-                <span class="cand-party">Avanza país</span>
-                <span class="stamp">✓</span>
-              </label>
+              <div class="ticket" style="--tab:#c0392b">
+                <input type="radio" name="voto" id="c1"
+                    value="Jorge Vejorano - Avanza país">
+                <label for="c1">
+                    <span class="tab"></span>
+                    <img
+                        src="images/avanza_pais.jpeg"
+                        class="candidate-photo"
+                        alt="Jorge Vejorano"
+                        onerror="this.onerror=null;this.src='images/candidato-default.png';">
+
+                    <div class="candidate-info">
+                        <span class="cand-name">Jorge Vejorano</span>
+                        <span class="cand-party">Avanza País</span>
+                    </div>
+                    <span class="stamp">✓</span>
+
+                </label>
             </div>
 
             <div class="ticket" style="--tab:#e08e45">
               <input type="radio" name="voto" id="c2" value="Roberto de la cruz - Alianza por el progreso">
               <label for="c2">
                 <span class="tab"></span>
+                <img
+                      src="images/alianza_progreso.jpeg"
+                      class="candidate-photo"
+                      alt="Roberto de la cruz"
+                      onerror="this.onerror=null;this.src='images/candidato-default.png';">
                 <span class="cand-name">Roberto de la cruz </span>
                 <span class="cand-party">Alianza por el progreso</span>
                 <span class="stamp">✓</span>
@@ -68,6 +83,11 @@
               <input type="radio" name="voto" id="c3" value="Jordan Piminchomo - Un camino diferente">
               <label for="c3">
                 <span class="tab"></span>
+                <img
+                      src="images/camino_diferente.jpeg"
+                      class="candidate-photo"
+                      alt="Jordan Piminchomo"
+                      onerror="this.onerror=null;this.src='images/candidato-default.png';">
                 <span class="cand-name">Jordan Piminchomo</span>
                 <span class="cand-party">Un camino diferente</span>
                 <span class="stamp">✓</span>
@@ -78,6 +98,11 @@
               <input type="radio" name="voto" id="c4" value="Jose Ruis Vega - Fuerza popular">
               <label for="c4">
                 <span class="tab"></span>
+                <img
+                      src="images/Fuerza_popular.jpeg"
+                      class="candidate-photo"
+                      alt="Jose Ruis Vega"
+                      onerror="this.onerror=null;this.src='images/candidato-default.png';">
                 <span class="cand-name">Jose Ruis Vega</span>
                 <span class="cand-party">Fuerza popular</span>
                 <span class="stamp">✓</span>
@@ -88,6 +113,11 @@
               <input type="radio" name="voto" id="c5" value="Victor Cruz Bubio - Partido aprista peruano">
               <label for="c5">
                 <span class="tab"></span>
+                <img
+                      src="images/partido_aprista.jpeg"
+                      class="candidate-photo"
+                      alt="Victor Cruz Bubio"
+                      onerror="this.onerror=null;this.src='images/candidato-default.png';">
                 <span class="cand-name">Victor Cruz Bubio</span>
                 <span class="cand-party">Partido aprista peruano</span>
                 <span class="stamp">✓</span>
@@ -131,4 +161,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="app.js"></script>
 </body>
+<header class="header-logo">
+    <img
+        src="images/logo.png"
+        alt="Logo"
+        class="logo"
+        onerror="this.onerror=null;this.src='images/logo-default.png';">
+</header>
 </html>
