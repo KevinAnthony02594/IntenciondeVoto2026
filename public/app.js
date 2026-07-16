@@ -1,31 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const gate = document.getElementById('gate');
+  const gateInput = document.getElementById('gate-dni');
+  const gateError = document.getElementById('gate-error');
+  const gateSubmit = document.getElementById('gate-submit');
+  const dniHidden = document.getElementById('dni');
+  const voterChip = document.getElementById('voter-chip');
+  const voterDniLabel = document.getElementById('voter-dni-label');
+
   const form = document.getElementById('vote-form');
-  const dniInput = document.getElementById('dni');
-  const votoSelect = document.getElementById('voto');
   const submitBtn = document.getElementById('submit-btn');
   const messageEl = document.getElementById('message');
-  
-  // Elementos del dashboard
-  const totalVotosEl = document.getElementById('total-votos');
-  const listaResultados = document.getElementById('lista-resultados');
 
-  // Cargar resultados iniciales
-  cargarResultados();
+  gateInput.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '');
+    gateError.textContent = '';
+  });
+  gateInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') gateSubmit.click(); });
 
-  // Prevenir que escriban letras en el DNI (UX)
-  dniInput.addEventListener('input', function() {
-    this.value = this.value.replace(/\D/g, ''); 
+  gateSubmit.addEventListener('click', () => {
+    const val = gateInput.value.trim();
+    if (!/^\d{8}$/.test(val)) {
+      gateError.textContent = 'Ingresa un DNI válido de 8 dígitos.';
+      return;
+    }
+    dniHidden.value = val;
+    voterDniLabel.textContent = 'DNI •••• ' + val.slice(-4);
+    voterChip.classList.add('show');
+    gate.classList.add('closing');
+    setTimeout(() => { gate.style.display = 'none'; }, 250);
   });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const dni = dniInput.value.trim();
-    const voto = votoSelect.value;
+    const dni = dniHidden.value.trim();
+    const votoInput = form.querySelector('input[name="voto"]:checked');
+    const voto = votoInput ? votoInput.value : '';
 
-    // Validación Frontend (Seguridad extra)
     if (!/^\d{8}$/.test(dni)) {
-      showMessage('El DNI debe tener 8 dígitos numéricos.', 'error');
+      showMessage('Verifica tu identidad antes de votar.', 'error');
       return;
     }
     if (!voto) {
@@ -33,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Bloquear botón para evitar envío múltiple
     submitBtn.disabled = true;
     submitBtn.innerText = 'Registrando...';
     messageEl.classList.add('hidden');
@@ -44,52 +56,25 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dni, voto })
       });
-
       const data = await response.json();
 
       if (response.ok) {
         showMessage(data.message, 'success');
-        form.reset();
-        cargarResultados(); // Actualizar dashboard
+        form.querySelectorAll('input[name="voto"]').forEach(i => i.checked = false);
       } else {
         showMessage(data.message, 'error');
       }
     } catch (error) {
       showMessage('Error de conexión. Intente nuevamente.', 'error');
     } finally {
-      // Desbloquear botón
       submitBtn.disabled = false;
-      submitBtn.innerText = 'Registrar Voto';
+      submitBtn.innerText = 'Registrar voto';
     }
   });
 
   function showMessage(text, type) {
     messageEl.textContent = text;
-    messageEl.className = type; // Asigna 'success' o 'error'
+    messageEl.className = type;
     messageEl.classList.remove('hidden');
-  }
-
-  async function cargarResultados() {
-    try {
-      const res = await fetch('/api/resultados');
-      const data = await res.json();
-      
-      if (data.success) {
-        totalVotosEl.textContent = data.total;
-        listaResultados.innerHTML = '';
-        
-        // Ordenar resultados de mayor a menor y mostrar
-        const resultadosOrdenados = Object.entries(data.resultados)
-          .sort((a, b) => b[1] - a[1]);
-
-        resultadosOrdenados.forEach(([partido, votos]) => {
-          const li = document.createElement('li');
-          li.innerHTML = `<span>${partido}</span> <strong>${votos} votos</strong>`;
-          listaResultados.appendChild(li);
-        });
-      }
-    } catch (error) {
-      console.error('Error al cargar resultados del dashboard.');
-    }
   }
 });

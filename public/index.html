@@ -1,46 +1,95 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elecciones 2026 - Registro de Voto</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elecciones 2026 · Registro de Voto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Elecciones Ciudadanas</h1>
-      <p>Registra tu preferencia de voto. Recuerda que el voto es único por DNI.</p>
-    </header>
 
-    <main>
+  <div class="stage">
+    <p class="eyebrow">Padrón electoral · 2026</p>
+    <h1>Elecciones Ciudadanas</h1>
+    <!-- <p class="subtitle">Tu identidad se verifica antes de mostrar la boleta. El voto es único por DNI y no puede modificarse una vez registrado.</p> -->
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Boleta de votación</h2>
+        <span class="voter-chip" id="voter-chip"><span class="dot"></span><span id="voter-dni-label"></span></span>
+      </div>
+      <p class="hint">Selecciona una sola opción y confirma tu voto.</p>
+
       <form id="vote-form">
-        <div class="form-group">
-          <label for="dni">Número de DNI (8 dígitos):</label>
-          <input type="text" id="dni" name="dni" maxlength="8" pattern="\d{8}" required placeholder="Ej. 12345678" autocomplete="off">
-        </div>
+        <input type="hidden" id="dni" name="dni">
 
-        <div class="form-group">
-          <label for="voto">Selecciona un partido:</label>
-          <select id="voto" name="voto" required>
-            <option value="" disabled selected>-- Elige una opción --</option>
-            <option value="Partido K">K</option>
-            <option value="Partido PJ">PJ</option>
+        <fieldset id="candidatos">
+          <div class="ticket" style="--tab:#c0392b">
+            <input type="radio" name="voto" id="c1" value="Ludwing Mendoza - APRA">
+            <label for="c1">
+              <span class="tab"></span>
+              <span class="cand-name">Ludwing Mendoza</span>
+              <span class="cand-party">APRA</span>
+              <span class="stamp">✓</span>
+            </label>
+          </div>
 
-          </select>
-        </div>
+          <div class="ticket" style="--tab:#e08e45">
+            <input type="radio" name="voto" id="c2" value="POCHO - Renovación">
+            <label for="c2">
+              <span class="tab"></span>
+              <span class="cand-name">POCHO</span>
+              <span class="cand-party">Renovación</span>
+              <span class="stamp">✓</span>
+            </label>
+          </div>
 
-        <button type="submit" id="submit-btn">Registrar Voto</button>
+          <div class="ticket" style="--tab:#2e8b57">
+            <input type="radio" name="voto" id="c3" value="Ricardo Sachun - Podemos Perú">
+            <label for="c3">
+              <span class="tab"></span>
+              <span class="cand-name">Ricardo Sachun</span>
+              <span class="cand-party">Podemos Perú</span>
+              <span class="stamp">✓</span>
+            </label>
+          </div>
+
+          <div class="ticket" style="--tab:#2c5f8a">
+            <input type="radio" name="voto" id="c4" value="Charles - Somos Perú">
+            <label for="c4">
+              <span class="tab"></span>
+              <span class="cand-name">Charles</span>
+              <span class="cand-party">Somos Perú</span>
+              <span class="stamp">✓</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <button type="submit" id="submit-btn">Registrar voto</button>
         <p id="message" class="hidden"></p>
       </form>
-    </main>
+    </div>
 
-    <!-- <aside class="dashboard">
-      <h2>Resultados en Vivo</h2>
-      <p>Total de votos registrados: <strong id="total-votos">0</strong></p>
-      <ul id="lista-resultados"></ul>
-    </aside> -->
+    <footer class="note">Votación </footer>
   </div>
+
+  <!-- Modal de verificación de DNI -->
+  <div class="gate" id="gate">
+    <div class="gate-card">
+      <div class="gate-slot">DNI</div>
+      <h3>Verifica tu identidad</h3>
+      <p>Ingresa tu número de DNI (8 dígitos) para acceder a la boleta.</p>
+      <input class="gate-input" id="gate-dni" maxlength="8" inputmode="numeric" placeholder="00000000" autocomplete="off">
+      <p class="gate-error" id="gate-error"></p>
+      <button id="gate-submit">Ingresar a la boleta</button>
+    </div>
+  </div>
+
   <script src="app.js"></script>
+
 </body>
 </html>
