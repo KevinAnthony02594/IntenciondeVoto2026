@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - Elecciones 2026</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- DataTables -->
+    <link rel="stylesheet"
+        href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="dashboard.css">
+
+</head>
+
+<body>
+
+<div id="loginPage" class="login-container">
+
+    <div class="login-card">
+
+        <div class="text-center">
+
+            <i class="bi bi-shield-lock-fill login-icon"></i>
+
+            <h2>Dashboard Administrativo</h2>
+
+            <p>
+                Ingrese su DNI para visualizar los resultados.
+            </p>
+
+        </div>
+
+        <div class="mt-4">
+
+            <input
+                type="password"
+                class="form-control form-control-lg"
+                id="dni"
+                maxlength="8"
+                placeholder="DNI del Administrador">
+
+        </div>
+
+        <div class="d-grid mt-3">
+
+            <button
+                id="btnLogin"
+                class="btn btn-primary btn-lg">
+
+                Ingresar
+
+            </button>
+
+        </div>
+
+        <div id="loginError"
+             class="alert alert-danger mt-3 d-none"></div>
+
+    </div>
+
+</div>
+
+<!-- ======================= -->
+
+<div id="dashboard" class="d-none">
+
+<nav class="navbar navbar-dark bg-dark">
+
+<div class="container-fluid">
+
+<span class="navbar-brand">
+
+<i class="bi bi-bar-chart-fill"></i>
+
+Elecciones Municipales 2026
+
+</span>
+
+<div>
+
+<span id="adminNombre"></span>
+
+<button
+class="btn btn-danger btn-sm ms-3"
+id="btnSalir">
+
+Salir
+
+</button>
+
+</div>
+
+</div>
+
+</nav>
+
+<div class="container-fluid mt-4">
+
+<!-- Tarjetas -->
+
+<div class="row g-3">
+
+<div class="col-lg-3">
+
+<div class="card dashboard-card">
+
+<div class="card-body">
+
+<h6>Total de votos</h6>
+
+<h2 id="totalVotos">0</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-3">
+
+<div class="card dashboard-card">
+
+<div class="card-body">
+
+<h6>Candidatos</h6>
+
+<h2 id="totalPartidos">0</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-3">
+
+<div class="card dashboard-card">
+
+<div class="card-body">
+
+<h6>Zonas</h6>
+
+<h2 id="totalZonas">0</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-3">
+
+<div class="card dashboard-card">
+
+<div class="card-body">
+
+<h6>Última actualización</h6>
+
+<h5 id="ultimaActualizacion">--</h5>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Gráficos -->
+
+<div class="row mt-4">
+
+<div class="col-lg-8">
+
+<div class="card">
+
+<div class="card-header">
+
+Votos por candidato
+
+</div>
+
+<div class="card-body">
+
+<canvas id="graficoBarras"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-4">
+
+<div class="card">
+
+<div class="card-header">
+
+Distribución
+
+</div>
+
+<div class="card-body">
+
+<canvas id="graficoPastel"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Segunda fila -->
+
+<div class="row mt-4">
+
+<div class="col-lg-6">
+
+<div class="card">
+
+<div class="card-header">
+
+Mapa de zonas
+
+</div>
+
+<div class="card-body">
+
+<div id="map"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-6">
+
+<div class="card">
+
+<div class="card-header">
+
+Votos por zona
+
+</div>
+
+<div class="card-body">
+
+<canvas id="graficoZona"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Tabla -->
+
+<div class="card mt-4">
+
+<div class="card-header">
+
+<div class="row">
+
+<div class="col-lg-4">
+
+<select
+class="form-select"
+id="filtroPartido">
+
+<option value="">Todos los partidos</option>
+
+</select>
+
+</div>
+
+<div class="col-lg-4">
+
+<select
+class="form-select"
+id="filtroZona">
+
+<option value="">Todas las zonas</option>
+
+</select>
+
+</div>
+
+<div class="col-lg-4 text-end">
+
+<button
+class="btn btn-success"
+id="btnActualizar">
+
+<i class="bi bi-arrow-clockwise"></i>
+
+Actualizar
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card-body">
+
+<table
+id="tablaVotos"
+class="table table-striped table-hover">
+
+<thead>
+
+<tr>
+
+<th>#</th>
+
+<th>DNI</th>
+
+<th>Zona</th>
+
+<th>Partido</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Librerías -->
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script src="dashboard.js"></script>
+
+</body>
+
+</html>

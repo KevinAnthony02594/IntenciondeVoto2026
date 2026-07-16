@@ -184,3 +184,60 @@ document.addEventListener('DOMContentLoaded', () => {
     messageEl.classList.remove('hidden');
   }
 });
+
+const adminAccess = document.getElementById("admin-access");
+
+const adminModal = document.getElementById("adminModal");
+
+const btnCerrarAdmin = document.getElementById("btnCerrarAdmin");
+
+const btnAdminLogin = document.getElementById("btnAdminLogin");
+
+adminAccess.addEventListener("click", () => {
+
+    adminModal.classList.remove("hidden");
+
+});
+
+btnCerrarAdmin.addEventListener("click", () => {
+
+    adminModal.classList.add("hidden");
+
+});
+
+btnAdminLogin.addEventListener("click", async () => {
+
+    const dni = document.getElementById("adminDni").value.trim();
+
+    const response = await fetch("/api/admin/login", {
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            dni
+        })
+
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        document.getElementById("adminError").innerHTML =
+            data.message;
+
+        return;
+
+    }
+
+    localStorage.setItem("token",data.token);
+
+    localStorage.setItem("nombre",data.nombre);
+
+    window.location.href="dashboard.html";
+
+});

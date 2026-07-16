@@ -1,0 +1,357 @@
+/* ===========================================================
+   DASHBOARD ELECCIONES 2026
+=========================================================== */
+
+:root{
+
+    --primary:#2563eb;
+    --secondary:#1e293b;
+    --success:#10b981;
+    --danger:#ef4444;
+    --warning:#f59e0b;
+
+    --bg:#f4f7fb;
+
+    --card:#ffffff;
+
+    --text:#1e293b;
+
+    --border:#e5e7eb;
+
+    --shadow:0 10px 25px rgba(0,0,0,.08);
+
+    --radius:18px;
+
+}
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+body{
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    font-family:"Segoe UI",sans-serif;
+
+}
+
+/*=========================
+LOGIN
+=========================*/
+
+.login-container{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:linear-gradient(135deg,#2563eb,#0f172a);
+
+}
+
+.login-card{
+
+    width:420px;
+
+    background:white;
+
+    border-radius:25px;
+
+    padding:45px;
+
+    box-shadow:0 25px 60px rgba(0,0,0,.25);
+
+    animation:fade .5s ease;
+
+}
+
+.login-icon{
+
+    font-size:70px;
+
+    color:var(--primary);
+
+}
+
+.login-card h2{
+
+    font-weight:700;
+
+    margin-top:15px;
+
+}
+
+.login-card p{
+
+    color:#666;
+
+}
+
+.form-control{
+
+    border-radius:12px;
+
+    padding:14px;
+
+}
+
+.btn-primary{
+
+    border-radius:12px;
+
+    padding:12px;
+
+    font-weight:600;
+
+}
+
+@keyframes fade{
+
+from{
+
+opacity:0;
+
+transform:translateY(20px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+/*=========================
+NAVBAR
+=========================*/
+
+.navbar{
+
+    box-shadow:var(--shadow);
+
+}
+
+.navbar-brand{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+#adminNombre{
+
+    color:white;
+
+    font-weight:600;
+
+}
+
+/*=========================
+CARDS
+=========================*/
+
+.dashboard-card{
+
+    border:none;
+
+    border-radius:20px;
+
+    box-shadow:var(--shadow);
+
+    transition:.3s;
+
+    overflow:hidden;
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.dashboard-card .card-body{
+
+    padding:30px;
+
+}
+
+.dashboard-card h6{
+
+    color:#666;
+
+    font-size:15px;
+
+    margin-bottom:15px;
+
+}
+
+.dashboard-card h2{
+
+    font-size:42px;
+
+    font-weight:bold;
+
+    color:var(--primary);
+
+}
+
+/*=========================
+GENERAL CARD
+=========================*/
+
+.card{
+
+    border:none;
+
+    border-radius:20px;
+
+    box-shadow:var(--shadow);
+
+}
+
+.card-header{
+
+    background:white;
+
+    border-bottom:1px solid var(--border);
+
+    font-weight:700;
+
+    font-size:18px;
+
+}
+
+.card-body{
+
+    padding:25px;
+
+}
+
+/*=========================
+MAPA
+=========================*/
+
+#map{
+
+    height:450px;
+
+    border-radius:18px;
+
+}
+
+/*=========================
+CHARTS
+=========================*/
+
+canvas{
+
+    max-height:420px;
+
+}
+
+/*=========================
+TABLA
+=========================*/
+
+.table{
+
+    margin-bottom:0;
+
+}
+
+.table thead{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.table th{
+
+    border:none;
+
+}
+
+.table td{
+
+    vertical-align:middle;
+
+}
+
+.dataTables_wrapper .dataTables_filter input{
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+    padding:6px 10px;
+
+}
+
+.dataTables_wrapper .dataTables_length select{
+
+    border-radius:8px;
+
+}
+
+.dataTables_paginate .paginate_button{
+
+    border-radius:8px!important;
+
+}
+
+.table-striped tbody tr:nth-of-type(odd){
+
+    background:#f9fafb;
+
+}
+
+/*=========================
+BOTONES
+=========================*/
+
+.btn{
+
+    border-radius:12px;
+
+}
+
+.btn-success{
+
+    background:#10b981;
+
+    border:none;
+
+}
+
+.btn-success:hover{
+
+    background:#059669;
+
+}
+
+.btn-danger{
+
+    border:none;
+
+}

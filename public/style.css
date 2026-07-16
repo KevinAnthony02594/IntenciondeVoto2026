@@ -247,3 +247,69 @@ footer.note{text-align:center;color:#7986a3;font-size:.78rem;margin-top:1.4rem;}
     color:#666;
     font-size:14px;
 }
+
+.modal-admin{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.5);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.hidden{
+
+    display:none;
+
+}
+
+.modal-admin-content{
+
+    width:360px;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:30px;
+
+    text-align:center;
+
+}
+
+.modal-admin-content input{
+
+    width:100%;
+
+    padding:12px;
+
+    margin-top:15px;
+
+}
+
+.modal-admin-content button{
+
+    margin:8px;
+
+    padding:10px 20px;
+
+}
+
+.note{
+
+    cursor:pointer;
+}
+
+.note:hover{
+
+    color:#0d6efd;
+}

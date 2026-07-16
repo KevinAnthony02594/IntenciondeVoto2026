@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
@@ -57,26 +58,225 @@ app.post('/api/votar', async (req, res) => {
 });
 
 // ✨ Endpoint extra: Obtener Resultados Totales
-app.get('/api/resultados', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('votos')
-      .select('voto');
+app.get('/api/resultados',verificarToken,async(req,res)=>{
 
-    if (error) throw error;
+    try{
 
-    // Calcular totales por partido y total general sin exponer DNI
-    const conteo = data.reduce((acc, curr) => {
-      acc[curr.voto] = (acc[curr.voto] || 0) + 1;
-      return acc;
-    }, {});
+        const {data,error}=await supabase
+        .from('votos')
+        .select("dni,voto,zona,fecha_registro");
 
-    res.json({ success: true, total: data.length, resultados: conteo });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Error al obtener resultados.' });
-  }
+        if(error) throw error;
+
+        const resultados={};
+
+        data.forEach(v=>{
+
+            resultados[v.voto]=(resultados[v.voto]||0)+1;
+
+        });
+
+        res.json({
+
+            success:true,
+
+            total:data.length,
+
+            resultados,
+
+            votos:data
+
+        });
+
+    }catch(e){
+
+        res.status(500).json({
+            success:false,
+            message: e.message
+
+        });
+
+    }
+
 });
 
+// Login simple para administrador
+app.post('/api/admin/login', async (req, res) => {
+
+    const { dni } = req.body;
+
+    if (!dni) {
+        return res.status(400).json({
+            success:false,
+            message:'Ingrese el DNI'
+        });
+    }
+
+    try{
+
+        const {data,error}=await supabase
+        .from('administradores')
+        .select('*')
+        .eq('dni',dni)
+        .eq('activo',true)
+        .single();
+
+        if(error || !data){
+
+            return res.status(401).json({
+                success:false,
+                message:'No autorizado'
+            });
+
+        }
+
+        const token=jwt.sign({
+
+            id:data.id,
+            dni:data.dni,
+            nombre:data.nombre
+
+        },process.env.JWT_SECRET,{
+
+            expiresIn:'8h'
+
+        });
+
+        res.json({
+
+            success:true,
+            token,
+            nombre:data.nombre
+
+        });
+
+    }catch(e){
+
+        res.status(500).json({
+
+            success:false,
+            message:'Error interno'
+
+        });
+
+    }
+
+});
+
+app.get('/api/resultados/:partido',verificarToken,async(req,res)=>{
+
+    const partido=req.params.partido;
+
+    try{
+
+        const {data,error}=await supabase
+
+        .from('votos')
+
+        .select('*')
+
+        .eq('voto',partido);
+
+        if(error) throw error;
+
+        res.json({
+
+            success:true,
+
+            total:data.length,
+
+            votos:data
+
+        });
+
+    }catch(e){
+
+        res.status(500).json({
+
+            success:false
+
+        });
+
+    }
+
+});
+
+app.get('/api/dashboard',verificarToken,async(req,res)=>{
+
+    try{
+
+        const {data,error}=await supabase
+
+        .from('votos')
+
+        .select('voto,zona');
+
+        if(error) throw error;
+
+        const partidos={};
+
+        const zonas={};
+
+        data.forEach(v=>{
+
+            partidos[v.voto]=(partidos[v.voto]||0)+1;
+
+            zonas[v.zona]=(zonas[v.zona]||0)+1;
+
+        });
+
+        res.json({
+
+            success:true,
+
+            total:data.length,
+
+            partidos,
+
+            zonas
+
+        });
+
+    }catch(e){
+
+        res.status(500).json({
+
+            success:false
+
+        });
+
+    }
+
+});
+function verificarToken(req,res,next){
+
+    const auth=req.headers.authorization;
+
+    if(!auth){
+
+        return res.status(401).json({
+            success:false
+        });
+
+    }
+
+    const token=auth.split(" ")[1];
+
+    try{
+
+        req.usuario=jwt.verify(token,process.env.JWT_SECRET);
+
+        next();
+
+    }catch(e){
+
+        return res.status(401).json({
+            success:false
+        });
+
+    }
+
+}
 // Iniciar servidor solo si no estamos en producción (Vercel usa module.exports)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {
