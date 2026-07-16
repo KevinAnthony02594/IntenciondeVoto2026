@@ -7,89 +7,118 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="stage">
     <p class="eyebrow">Padrón electoral · 2026</p>
     <h1>Elecciones Ciudadanas</h1>
-    <!-- <p class="subtitle">Tu identidad se verifica antes de mostrar la boleta. El voto es único por DNI y no puede modificarse una vez registrado.</p> -->
+    <p class="subtitle" id="main-subtitle">Selecciona tu zona en el mapa para acceder a la boleta de votación.</p>
 
-    <div class="panel">
-      <div class="panel-head">
-        <h2>Boleta de votación</h2>
-        <span class="voter-chip" id="voter-chip"><span class="dot"></span><span id="voter-dni-label"></span></span>
+    <!-- ---------- Pantalla 1: Mapa de zonas ---------- -->
+    <section class="screen active" id="screen-map">
+      <div class="panel">
+        <div class="panel-head"><h2>Zonas electorales · Trujillo</h2></div>
+        <p class="hint">Haz clic en un punto del mapa o en una zona de la lista para votar.</p>
+        <div id="map"></div>
+        <div class="zone-legend" id="zone-legend"></div>
       </div>
-      <p class="hint">Selecciona una sola opción y confirma tu voto.</p>
+    </section>
 
-      <form id="vote-form">
-        <input type="hidden" id="dni" name="dni">
-
-        <fieldset id="candidatos">
-          <div class="ticket" style="--tab:#c0392b">
-            <input type="radio" name="voto" id="c1" value="Ludwing Mendoza - APRA">
-            <label for="c1">
-              <span class="tab"></span>
-              <span class="cand-name">Ludwing Mendoza</span>
-              <span class="cand-party">APRA</span>
-              <span class="stamp">✓</span>
-            </label>
+    <!-- ---------- Pantalla 2: Boleta ---------- -->
+    <section class="screen" id="screen-ballot">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Boleta de votación</h2>
+          <div class="chips">
+            <span class="chip" id="zone-chip"></span>
+            <span class="chip" id="voter-chip"></span>
           </div>
+        </div>
+        <p class="hint">Selecciona una sola opción y confirma tu voto.</p>
 
-          <div class="ticket" style="--tab:#e08e45">
-            <input type="radio" name="voto" id="c2" value="POCHO - Renovación">
-            <label for="c2">
-              <span class="tab"></span>
-              <span class="cand-name">POCHO</span>
-              <span class="cand-party">Renovación</span>
-              <span class="stamp">✓</span>
-            </label>
-          </div>
+        <form id="vote-form">
+          <input type="hidden" id="dni" name="dni">
+          <input type="hidden" id="zona" name="zona">
 
-          <div class="ticket" style="--tab:#2e8b57">
-            <input type="radio" name="voto" id="c3" value="Ricardo Sachun - Podemos Perú">
-            <label for="c3">
-              <span class="tab"></span>
-              <span class="cand-name">Ricardo Sachun</span>
-              <span class="cand-party">Podemos Perú</span>
-              <span class="stamp">✓</span>
-            </label>
-          </div>
+          <fieldset id="candidatos">
+            <div class="ticket" style="--tab:#c0392b">
+              <input type="radio" name="voto" id="c1" value="Ludwing Mendoza - APRA">
+              <label for="c1">
+                <span class="tab"></span>
+                <span class="cand-name">Ludwing Mendoza</span>
+                <span class="cand-party">APRA</span>
+                <span class="stamp">✓</span>
+              </label>
+            </div>
 
-          <div class="ticket" style="--tab:#2c5f8a">
-            <input type="radio" name="voto" id="c4" value="Charles - Somos Perú">
-            <label for="c4">
-              <span class="tab"></span>
-              <span class="cand-name">Charles</span>
-              <span class="cand-party">Somos Perú</span>
-              <span class="stamp">✓</span>
-            </label>
-          </div>
-        </fieldset>
+            <div class="ticket" style="--tab:#e08e45">
+              <input type="radio" name="voto" id="c2" value="POCHO - Renovación">
+              <label for="c2">
+                <span class="tab"></span>
+                <span class="cand-name">POCHO</span>
+                <span class="cand-party">Renovación</span>
+                <span class="stamp">✓</span>
+              </label>
+            </div>
 
-        <button type="submit" id="submit-btn">Registrar voto</button>
-        <p id="message" class="hidden"></p>
-      </form>
-    </div>
+            <div class="ticket" style="--tab:#2e8b57">
+              <input type="radio" name="voto" id="c3" value="Ricardo Sachun - Podemos Perú">
+              <label for="c3">
+                <span class="tab"></span>
+                <span class="cand-name">Ricardo Sachun</span>
+                <span class="cand-party">Podemos Perú</span>
+                <span class="stamp">✓</span>
+              </label>
+            </div>
 
-    <footer class="note">Votación </footer>
+            <div class="ticket" style="--tab:#2c5f8a">
+              <input type="radio" name="voto" id="c4" value="Charles - Somos Perú">
+              <label for="c4">
+                <span class="tab"></span>
+                <span class="cand-name">Charles</span>
+                <span class="cand-party">Somos Perú</span>
+                <span class="stamp">✓</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <button type="submit" id="submit-btn">Registrar voto</button>
+          <p id="message" class="hidden"></p>
+        </form>
+
+        <p style="margin-top:1rem;text-align:center;">
+          <button type="button" class="link-btn" id="back-to-map">← Elegir otra zona</button>
+        </p>
+      </div>
+    </section>
+
+    <footer class="note">Municipalidad Distrital de Moche · Sistema de votación interna</footer>
   </div>
 
-  <!-- Modal de verificación de DNI -->
-  <div class="gate" id="gate">
+  <!-- Modal de identificación (DNI opcional) -->
+  <div class="gate hidden-gate" id="gate">
     <div class="gate-card">
       <div class="gate-slot">DNI</div>
-      <h3>Verifica tu identidad</h3>
-      <p>Ingresa tu número de DNI (8 dígitos) para acceder a la boleta.</p>
-      <input class="gate-input" id="gate-dni" maxlength="8" inputmode="numeric" placeholder="00000000" autocomplete="off">
+      <h3>Identifícate (opcional)</h3>
+      <p class="gate-zone" id="gate-zone-label"></p>
+      <p class="gate-optional-note">
+        El DNI <strong>no es obligatorio</strong>: puedes votar sin ingresarlo.
+        Si lo ingresas, ayuda a verificar que cada persona vote una sola vez
+        y debe tener 8 dígitos.
+      </p>
+      <input class="gate-input" id="gate-dni" maxlength="8" inputmode="numeric" placeholder="00000000 (opcional)" autocomplete="off">
       <p class="gate-error" id="gate-error"></p>
-      <button id="gate-submit">Ingresar a la boleta</button>
+      <button id="gate-submit">Continuar con este DNI</button>
+      <button type="button" class="gate-skip" id="gate-skip">Votar sin ingresar DNI</button>
+      <br>
+      <button type="button" class="gate-cancel" id="gate-cancel">Cancelar</button>
     </div>
   </div>
 
-  <script src="app.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

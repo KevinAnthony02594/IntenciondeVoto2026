@@ -16,23 +16,30 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 🎯 Endpoint principal: Registrar Voto
+// El DNI es OPCIONAL: el elector puede votar sin ingresarlo.
+// Si lo ingresa, debe tener 8 dígitos y sirve para evitar votos duplicados.
 app.post('/api/votar', async (req, res) => {
-  const { dni, voto } = req.body;
+  const { dni, voto, zona } = req.body;
 
   // 1. Validaciones de negocio (Backend)
-  if (!dni || !voto) {
-    return res.status(400).json({ success: false, message: 'El DNI y el voto son obligatorios.' });
+  if (!voto) {
+    return res.status(400).json({ success: false, message: 'Debes seleccionar una opción de voto.' });
   }
 
-  if (!/^\d{8}$/.test(dni)) {
-    return res.status(400).json({ success: false, message: 'El DNI debe tener exactamente 8 dígitos numéricos.' });
+  let dniLimpio = null;
+  if (dni) {
+    if (!/^\d{8}$/.test(dni)) {
+      return res.status(400).json({ success: false, message: 'Si ingresas tu DNI, debe tener exactamente 8 dígitos numéricos.' });
+    }
+    dniLimpio = dni;
   }
 
   try {
     // 2. Intentar insertar el voto en Supabase
+    // dni puede ser null (voto anónimo); zona puede ser null si no se seleccionó
     const { error } = await supabase
       .from('votos')
-      .insert([{ dni, voto }]);
+      .insert([{ dni: dniLimpio, voto, zona: zona || null }]);
 
     // 3. Manejo de errores (incluido el DNI duplicado)
     if (error) {
@@ -70,12 +77,7 @@ app.get('/api/resultados', async (req, res) => {
   }
 });
 
-// Iniciar servidor
-app.listen(port, () => {
-  console.log(`Servidor de Elecciones corriendo en http://localhost:${port}`);
-});
-
-// Solo iniciar el servidor localmente si no estamos en producción
+// Iniciar servidor solo si no estamos en producción (Vercel usa module.exports)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {
     console.log(`Servidor de Elecciones corriendo en http://localhost:${port}`);
