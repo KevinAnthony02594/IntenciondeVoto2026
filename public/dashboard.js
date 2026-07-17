@@ -535,11 +535,20 @@ function cargarMapa(votos){
 
 function actualizarTabla(votos){
 
-    if(tabla){
+    if (!tabla) {
 
-        tabla.destroy();
+        tabla = $("#tablaVotos").DataTable({
+            pageLength:10,
+            responsive:true
+        });
 
     }
+
+    tabla.clear();
+
+    tabla.rows.add(datos);
+
+    tabla.draw(false);
 
     const tbody=document.querySelector("#tablaVotos tbody");
 

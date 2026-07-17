@@ -155,7 +155,7 @@ app.post('/api/admin/login', async (req, res) => {
         res.status(500).json({
 
             success:false,
-            message:'Error interno'
+            message:e.message
 
         });
 
@@ -255,7 +255,8 @@ function verificarToken(req,res,next){
     if(!auth){
 
         return res.status(401).json({
-            success:false
+            success:false,
+            message:"Token no enviado"
         });
 
     }
@@ -264,14 +265,23 @@ function verificarToken(req,res,next){
 
     try{
 
-        req.usuario=jwt.verify(token,process.env.JWT_SECRET);
+        req.usuario=jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
 
         next();
 
-    }catch(e){
+    }catch(err){
+
+        console.log(err);
 
         return res.status(401).json({
-            success:false
+
+            success:false,
+
+            message:"Token inválido"
+
         });
 
     }
