@@ -1,5 +1,7 @@
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+const jwt = require('jsonwebtoken');
+
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
