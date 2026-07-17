@@ -129,7 +129,6 @@ throw new Error(data.message);
 const dash=data.dashboard;
 
 
-
 actualizarKpis(dash);
 
 
