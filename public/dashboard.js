@@ -1,703 +1,1086 @@
-// ======================================================
-// Dashboard Elecciones 2026
-// Parte 1
-// ======================================================
+document.addEventListener("DOMContentLoaded",()=>{
 
-let TOKEN = "";
 
-let tabla = null;
+const token = localStorage.getItem("token");
 
-let chartBarras = null;
-let chartPastel = null;
-let chartZona = null;
+const nombre = localStorage.getItem("nombre");
 
-let mapa = null;
-let marcadores = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+if(!token){
 
-    // Si existe un token guardado
-    const tokenGuardado = localStorage.getItem("token");
+    window.location.href="index.html";
 
-    if (tokenGuardado) {
+    return;
 
-        TOKEN = tokenGuardado;
+}
 
-        document.getElementById("loginPage").classList.add("d-none");
-        document.getElementById("dashboard").classList.remove("d-none");
 
-        document.getElementById("adminNombre").innerHTML =
-            localStorage.getItem("nombre");
+document.getElementById("nombreAdmin").innerText =
+nombre || "Administrador";
 
-        iniciarDashboard();
 
-    }
 
-    document
-        .getElementById("btnLogin")
-        .addEventListener("click", login);
+let chartBarras=null;
 
-    document
-        .getElementById("btnSalir")
-        .addEventListener("click", cerrarSesion);
+let chartDona=null;
 
-    document
-        .getElementById("btnActualizar")
-        .addEventListener("click", iniciarDashboard);
+let mapa=null;
+
+let tabla=null;
+
+
+
+const zonasMapa=[
+
+{
+nombre:"El Milagro",
+lat:-8.023047,
+lng:-79.067330
+},
+
+{
+nombre:"Villa del Mar",
+lat:-8.097796,
+lng:-79.062740
+},
+
+{
+nombre:"Víctor Raúl",
+lat:-8.021041,
+lng:-79.070422
+},
+
+{
+nombre:"Huanchaquito",
+lat:-8.097705,
+lng:-79.109337
+},
+
+{
+nombre:"Huanchaco Balneario",
+lat:-8.078579,
+lng:-79.120930
+},
+
+{
+nombre:"El Trópico",
+lat:-8.086008,
+lng:-79.076372
+}
+
+];
+
+
+
+// =============================
+// CARGAR DASHBOARD
+// =============================
+
+
+async function cargarDashboard(){
+
+
+try{
+
+
+const response = await fetch("/api/dashboard",{
+
+
+headers:{
+
+
+"Authorization":
+
+"Bearer "+token
+
+
+}
+
 
 });
 
-async function login() {
 
-    const dni = document.getElementById("dni").value.trim();
 
-    const error = document.getElementById("loginError");
+const data = await response.json();
 
-    error.classList.add("d-none");
 
-    if (dni.length !== 8) {
 
-        error.innerHTML = "Ingrese un DNI válido.";
+if(!response.ok){
 
-        error.classList.remove("d-none");
 
+if(response.status===401){
+
+
+localStorage.clear();
+
+window.location.href="index.html";
+
+
+}
+
+
+throw new Error(data.message);
+
+
+}
+
+
+
+const dash=data.dashboard;
+
+
+
+actualizarKpis(dash);
+
+
+crearGraficoBarras(dash.partidos);
+
+
+crearGraficoDona(dash.partidos);
+
+
+crearMapa(dash.detalleZona);
+
+
+crearRanking(dash.partidos);
+
+
+crearTablaZona(dash.detalleZona);
+
+
+crearTablaVotos(dash.votos);
+
+
+
+document.getElementById(
+"ultimaActualizacion"
+).innerText =
+new Date().toLocaleString();
+
+
+
+}catch(error){
+
+
+console.error(error);
+
+
+alert(
+"Error cargando dashboard"
+);
+
+
+}
+
+
+
+}
+
+
+
+
+// =============================
+// KPI
+// =============================
+
+
+function actualizarKpis(dash){
+
+
+document.getElementById("kpiTotal")
+.innerText=dash.total;
+
+
+
+let conDni=0;
+
+
+let sinDni=0;
+
+
+
+dash.votos.forEach(v=>{
+
+
+if(v.dni){
+
+conDni++;
+
+}else{
+
+sinDni++;
+
+}
+
+
+});
+
+
+
+document.getElementById("kpiDni")
+.innerText=conDni;
+
+
+
+document.getElementById("kpiAnonimos")
+.innerText=sinDni;
+
+
+
+document.getElementById("kpiZonas")
+.innerText=
+Object.keys(dash.zonas).length;
+
+
+
+if(dash.ganador){
+
+
+document.getElementById("kpiGanador")
+.innerText=
+dash.ganador.nombre;
+
+
+
+document.getElementById("kpiGanadorVotos")
+.innerText=
+dash.ganador.votos+" votos";
+
+
+}
+
+
+}
+// =============================
+// GRAFICO DE BARRAS
+// =============================
+let graficoBarras;
+
+
+function crearGraficoBarras(partidos){
+
+
+    const datos = Object.values(partidos);
+
+
+    const labels = datos.map(p=>p.nombre);
+
+
+    const valores = datos.map(p=>p.votos);
+
+
+
+    const ctx = document
+        .getElementById("graficoBarras")
+        .getContext("2d");
+
+
+
+    // destruir gráfico anterior
+    if(graficoBarras){
+
+        graficoBarras.destroy();
+
+    }
+
+
+
+    graficoBarras = new Chart(ctx,{
+
+
+        type:"bar",
+
+
+        data:{
+
+
+            labels:labels,
+
+
+            datasets:[{
+
+                label:"Cantidad de votos",
+
+                data:valores
+
+            }]
+
+        },
+
+
+        options:{
+
+
+            responsive:true,
+
+
+            plugins:{
+
+
+                legend:{
+
+
+                    display:false
+
+
+                }
+
+
+            }
+
+
+        }
+
+
+    });
+
+
+}
+
+// =============================
+// GRAFICO DONA
+// =============================
+
+let graficoDona;
+
+
+function crearGraficoDona(partidos){
+
+
+    const datos = Object.values(partidos);
+
+
+
+    const ctx = document
+        .getElementById("graficoDona")
+        .getContext("2d");
+
+
+
+    // evitar duplicar gráficos al actualizar cada cierto tiempo
+    if(graficoDona){
+
+        graficoDona.destroy();
+
+    }
+
+
+
+    graficoDona = new Chart(ctx,{
+
+        type:"doughnut",
+
+
+        data:{
+
+
+            labels:datos.map(p=>p.nombre),
+
+
+            datasets:[{
+
+                label:"Votos",
+
+                data:datos.map(p=>p.votos)
+
+            }]
+
+
+        },
+
+
+        options:{
+
+
+            responsive:true,
+
+
+            plugins:{
+
+
+                legend:{
+
+
+                    position:"right"
+
+
+                }
+
+
+            }
+
+
+        }
+
+
+    });
+
+
+
+}
+// =============================
+// MAPA POR ZONAS
+// =============================
+function crearMapa(detalleZona){
+
+
+    if(mapa){
+
+        mapa.remove();
+
+    }
+
+
+
+    mapa = L.map("mapaDashboard")
+    .setView(
+        [-8.067,-79.086],
+        12
+    );
+
+
+
+    L.tileLayer(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+
+            attribution:
+            "&copy; OpenStreetMap"
+
+        }
+
+    ).addTo(mapa);
+
+
+
+
+    Object.entries(detalleZona).forEach(([zona,datos])=>{
+
+
+        let contenido = `
+
+
+        <strong>${zona}</strong>
+
+
+        <br>
+
+
+        Total votos:
+
+        <b>${datos.total}</b>
+
+
+        <hr>
+
+
+        `;
+
+
+
+        Object.entries(datos.partidos)
+        .forEach(([partido,cantidad])=>{
+
+
+            contenido += `
+
+
+            ${partido}
+
+            :
+
+            <b>${cantidad}</b>
+
+            votos
+
+            <br>
+
+
+            `;
+
+
+        });
+
+
+
+
+        let coordenada =
+        zonasMapa.find(
+            z=>z.nombre===zona
+        );
+
+
+
+        if(coordenada){
+
+
+            L.marker(
+
+                [
+                    coordenada.lat,
+                    coordenada.lng
+                ]
+
+            )
+
+            .addTo(mapa)
+
+            .bindPopup(contenido);
+
+
+        }
+
+
+
+    });
+
+
+} 
+
+// =============================
+// RANKING
+// =============================
+function crearRanking(partidos){
+
+
+    const contenedor =
+    document.getElementById("rankingCandidatos");
+
+
+    if(!contenedor){
+
+        console.error("No existe el contenedor rankingCandidatos");
         return;
 
     }
 
-    try {
 
-        const response = await fetch("/api/admin/login", {
 
-            method: "POST",
+    const datos = Object.values(partidos);
 
-            headers: {
-                "Content-Type": "application/json"
-            },
 
-            body: JSON.stringify({
-                dni
-            })
 
-        });
+    datos.sort((a,b)=>b.votos-a.votos);
 
-        const data = await response.json();
 
-        if (!response.ok) {
 
-            error.innerHTML = data.message;
+    let html="";
 
-            error.classList.remove("d-none");
 
-            return;
 
-        }
+    datos.forEach((p,index)=>{
 
-        TOKEN = data.token;
 
-        localStorage.setItem("token", TOKEN);
-        localStorage.setItem("nombre", data.nombre);
+        html += `
 
-        document.getElementById("adminNombre").innerHTML =
-            data.nombre;
+        <div class="ranking-item">
 
-        document
-            .getElementById("loginPage")
-            .classList.add("d-none");
 
-        document
-            .getElementById("dashboard")
-            .classList.remove("d-none");
+            <div>
 
-        iniciarDashboard();
+                <strong>
+                    #${index+1} ${p.nombre}
+                </strong>
 
-    } catch (e) {
+                <br>
 
-        error.innerHTML = "No se pudo conectar con el servidor.";
+                <small>
+                    ${p.partido}
+                </small>
 
-        error.classList.remove("d-none");
+            </div>
 
-    }
 
-}
+            <span>
 
-function cerrarSesion() {
+                ${p.votos} votos
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("nombre");
+            </span>
 
-    location.reload();
 
-}
-
-async function iniciarDashboard() {
-
-    try {
-
-        const response = await fetch("/api/dashboard", {
-
-            headers: {
-
-                Authorization: "Bearer " + TOKEN
-
-            }
-
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-
-            alert("Sesión expirada.");
-
-            cerrarSesion();
-
-            return;
-
-        }
-
-        cargarIndicadores(data);
-
-        cargarResultados();
-
-    } catch (e) {
-
-        console.log(e);
-
-    }
-
-}
-
-function cargarIndicadores(data) {
-
-    document.getElementById("totalVotos").innerHTML =
-        data.total;
-
-    document.getElementById("totalPartidos").innerHTML =
-        Object.keys(data.partidos).length;
-
-    document.getElementById("totalZonas").innerHTML =
-        Object.keys(data.zonas).length;
-
-    document.getElementById("ultimaActualizacion").innerHTML =
-        new Date().toLocaleTimeString();
-
-}
-
-async function cargarResultados() {
-
-    const response = await fetch("/api/resultados", {
-
-        headers: {
-
-            Authorization: "Bearer " + TOKEN
-
-        }
-
-    });
-
-    const data = await response.json();
-
-    if (!data.success) return;
-
-    actualizarTabla(data.votos);
-
-    actualizarFiltros(data.votos);
-
-    crearGraficoBarras(data.resultados);
-
-    crearGraficoPastel(data.resultados);
-
-    crearGraficoZona(data.votos);
-
-    cargarMapa(data.votos);
-
-}
-// ======================================================
-// Dashboard Elecciones 2026
-// Parte 2 - Gráficos y Mapa
-// ======================================================
-
-const COLORES = {
-    "Jorge Vejorano - Avanza país": "#c0392b",
-    "Roberto de la cruz - Alianza por el progreso": "#e67e22",
-    "Jordan Piminchomo - Un camino diferente": "#27ae60",
-    "Jose Ruis Vega - Fuerza popular": "#2980b9",
-    "Victor Cruz Bubio - Partido aprista peruano": "#8e44ad"
-};
-
-//=====================================================
-// GRÁFICO DE BARRAS
-//=====================================================
-
-function crearGraficoBarras(resultados){
-
-    const labels = Object.keys(resultados);
-
-    const valores = Object.values(resultados);
-
-    const colores = labels.map(x=>COLORES[x] || "#3498db");
-
-    if(chartBarras){
-
-        chartBarras.destroy();
-
-    }
-
-    chartBarras = new Chart(
-
-        document.getElementById("graficoBarras"),
-
-        {
-
-            type:"bar",
-
-            data:{
-
-                labels,
-
-                datasets:[{
-
-                    label:"Votos",
-
-                    data:valores,
-
-                    backgroundColor:colores,
-
-                    borderRadius:8
-
-                }]
-
-            },
-
-            options:{
-
-                responsive:true,
-
-                plugins:{
-
-                    legend:{
-                        display:false
-                    }
-
-                },
-
-                scales:{
-
-                    y:{
-                        beginAtZero:true
-                    }
-
-                }
-
-            }
-
-        }
-
-    );
-
-}
-
-//=====================================================
-// GRÁFICO DE PASTEL
-//=====================================================
-
-function crearGraficoPastel(resultados){
-
-    const labels = Object.keys(resultados);
-
-    const valores = Object.values(resultados);
-
-    const colores = labels.map(x=>COLORES[x] || "#3498db");
-
-    if(chartPastel){
-
-        chartPastel.destroy();
-
-    }
-
-    chartPastel = new Chart(
-
-        document.getElementById("graficoPastel"),
-
-        {
-
-            type:"pie",
-
-            data:{
-
-                labels,
-
-                datasets:[{
-
-                    data:valores,
-
-                    backgroundColor:colores
-
-                }]
-
-            },
-
-            options:{
-
-                responsive:true,
-
-                plugins:{
-
-                    legend:{
-
-                        position:"bottom"
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    );
-
-}
-
-//=====================================================
-// GRÁFICO POR ZONA
-//=====================================================
-
-function crearGraficoZona(votos){
-
-    const zonas={};
-
-    votos.forEach(v=>{
-
-        zonas[v.zona]=(zonas[v.zona]||0)+1;
-
-    });
-
-    const labels=Object.keys(zonas);
-
-    const valores=Object.values(zonas);
-
-    if(chartZona){
-
-        chartZona.destroy();
-
-    }
-
-    chartZona=new Chart(
-
-        document.getElementById("graficoZona"),
-
-        {
-
-            type:"doughnut",
-
-            data:{
-
-                labels,
-
-                datasets:[{
-
-                    data:valores,
-
-                    backgroundColor:[
-
-                        "#c0392b",
-
-                        "#27ae60",
-
-                        "#2980b9",
-
-                        "#f39c12",
-
-                        "#8e44ad",
-
-                        "#16a085"
-
-                    ]
-
-                }]
-
-            },
-
-            options:{
-
-                responsive:true,
-
-                plugins:{
-
-                    legend:{
-
-                        position:"bottom"
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    );
-
-}
-
-//=====================================================
-// MAPA
-//=====================================================
-
-function cargarMapa(votos){
-
-    const zonas={
-
-        "El Milagro":[-8.023047,-79.067330],
-
-        "Villa del Mar":[-8.097796,-79.062740],
-
-        "Víctor Raúl":[-8.021041,-79.070422],
-
-        "Huanchaquito":[-8.097705,-79.109337],
-
-        "Huanchaco Balneario":[-8.078579,-79.120930],
-
-        "El Trópico":[-8.086008,-79.076372]
-
-    };
-
-    if(!mapa){
-
-        mapa=L.map("map").setView(
-
-            [-8.067,-79.086],
-
-            12
-
-        );
-
-        L.tileLayer(
-
-            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-
-            {
-
-                attribution:"© OpenStreetMap"
-
-            }
-
-        ).addTo(mapa);
-
-    }
-
-    marcadores.forEach(m=>{
-
-        mapa.removeLayer(m);
-
-    });
-
-    marcadores=[];
-
-    const conteo={};
-
-    votos.forEach(v=>{
-
-        conteo[v.zona]=(conteo[v.zona]||0)+1;
-
-    });
-
-    Object.keys(conteo).forEach(z=>{
-
-        if(!zonas[z]) return;
-
-        const marker=L.marker(zonas[z])
-
-        .addTo(mapa)
-
-        .bindPopup(
-
-            `<b>${z}</b><br>
-            Total votos: <b>${conteo[z]}</b>`
-
-        );
-
-        marcadores.push(marker);
-
-    });
-
-}
-// ======================================================
-// Dashboard Elecciones 2026
-// Parte 3 - Tabla, Filtros y Auto Refresh
-// ======================================================
-
-//===========================================
-// TABLA
-//===========================================
-
-function actualizarTabla(votos){
-
-    if (!tabla) {
-
-        tabla = $("#tablaVotos").DataTable({
-            pageLength:10,
-            responsive:true
-        });
-
-    }
-
-    tabla.clear();
-
-    tabla.rows.add(datos);
-
-    tabla.draw(false);
-
-    const tbody=document.querySelector("#tablaVotos tbody");
-
-    tbody.innerHTML="";
-
-    votos.forEach((v,index)=>{
-
-        const tr=document.createElement("tr");
-
-        tr.innerHTML=`
-
-            <td>${index+1}</td>
-
-            <td>${v.dni ? "****"+String(v.dni).slice(-4) : "ANÓNIMO"}</td>
-
-            <td>${v.zona ?? ""}</td>
-
-            <td>${v.voto}</td>
+        </div>
 
         `;
 
-        tbody.appendChild(tr);
 
     });
 
-    tabla=$("#tablaVotos").DataTable({
 
-        destroy:true,
 
-        pageLength:10,
+    contenedor.innerHTML = html;
 
-        responsive:true,
-
-        language:{
-            url:"https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json"
-        }
-
-    });
 
 }
 
-//===========================================
-// FILTROS
-//===========================================
+// =============================
+// TABLA ZONA X PARTIDO
+// =============================
 
-function actualizarFiltros(votos){
+function crearTablaZona(detalleZona){
 
-    const partidos=[...new Set(votos.map(v=>v.voto))];
 
-    const zonas=[...new Set(votos.map(v=>v.zona))];
+    const cabecera =
+    document.getElementById("cabeceraZona");
 
-    const filtroPartido=document.getElementById("filtroPartido");
 
-    const filtroZona=document.getElementById("filtroZona");
+    const cuerpo =
+    document.getElementById("bodyZona");
 
-    filtroPartido.innerHTML='<option value="">Todos los partidos</option>';
 
-    filtroZona.innerHTML='<option value="">Todas las zonas</option>';
 
-    partidos.forEach(p=>{
+    if(!cabecera || !cuerpo){
 
-        filtroPartido.innerHTML+=`<option value="${p}">${p}</option>`;
-
-    });
-
-    zonas.forEach(z=>{
-
-        filtroZona.innerHTML+=`<option value="${z}">${z}</option>`;
-
-    });
-
-    filtroPartido.onchange=filtrarTabla;
-
-    filtroZona.onchange=filtrarTabla;
-
-}
-
-//===========================================
-// FILTRAR
-//===========================================
-
-function filtrarTabla(){
-
-    const partido=document.getElementById("filtroPartido").value;
-
-    const zona=document.getElementById("filtroZona").value;
-
-    tabla.column(3).search(partido);
-
-    tabla.column(2).search(zona);
-
-    tabla.draw();
-
-}
-
-//===========================================
-// AUTO REFRESH
-//===========================================
-
-setInterval(()=>{
-
-    if(TOKEN){
-
-        iniciarDashboard();
+        console.error("No existe tabla zona");
+        return;
 
     }
 
-},5000);
 
-//===========================================
-// ANIMACIÓN DE TARJETAS
-//===========================================
 
-window.addEventListener("load",()=>{
+    cabecera.innerHTML = `
 
-    document.querySelectorAll(".dashboard-card").forEach((card,i)=>{
+        <th>Zona</th>
 
-        card.style.opacity="0";
+    `;
 
-        card.style.transform="translateY(20px)";
 
-        setTimeout(()=>{
 
-            card.style.transition=".5s";
+    // Obtener partidos únicos
 
-            card.style.opacity="1";
+    let partidos = new Set();
 
-            card.style.transform="translateY(0px)";
 
-        },i*120);
+
+    Object.values(detalleZona).forEach(z=>{
+
+
+        Object.keys(z.partidos)
+        .forEach(p=>partidos.add(p));
+
 
     });
 
-});
 
-//===========================================
-// MENSAJE DE BIENVENIDA
-//===========================================
 
-function mostrarBienvenida(){
+    partidos=[...partidos];
 
-    console.log(
 
-        "%cDashboard Elecciones 2026",
 
-        "font-size:20px;color:#2563eb;font-weight:bold"
+    // Cabecera dinámica
 
-    );
+    partidos.forEach(p=>{
+
+
+        cabecera.innerHTML += `
+
+        <th>
+        ${p}
+        </th>
+
+        `;
+
+
+    });
+
+
+
+    cabecera.innerHTML += `
+
+    <th>Total</th>
+
+    `;
+
+
+
+    cuerpo.innerHTML="";
+
+
+
+    Object.entries(detalleZona)
+    .forEach(([zona,datos])=>{
+
+
+        let fila=`
+
+
+        <tr>
+
+        <td>
+        ${zona}
+        </td>
+
+        `;
+
+
+
+        let total=0;
+
+
+
+        partidos.forEach(p=>{
+
+
+            let cantidad =
+            datos.partidos[p] || 0;
+
+
+
+            total += cantidad;
+
+
+
+            fila += `
+
+            <td>
+            ${cantidad}
+            </td>
+
+            `;
+
+
+        });
+
+
+
+        fila += `
+
+        <td>
+        <b>${total}</b>
+        </td>
+
+        </tr>
+
+        `;
+
+
+
+        cuerpo.innerHTML += fila;
+
+
+    });
+
+
+}
+// =============================
+// TABLA DE VOTOS DETALLADA
+// =============================
+
+function crearTablaVotos(votos){
+
+
+    const tablaHtml = $("#tablaVotos");
+
+
+    if(tablaHtml.length === 0){
+        console.error("No existe #tablaVotos");
+        return;
+    }
+
+
+
+    // Crear DataTable solo una vez
+    if(!tabla){
+
+
+        tabla = $('#tablaVotos').DataTable({
+
+            responsive:true,
+
+            pageLength:10,
+
+            order:[[0,"desc"]],
+
+            language:{
+
+                search:"Buscar:",
+
+                lengthMenu:
+                "Mostrar _MENU_ registros",
+
+                info:
+                "Mostrando _START_ a _END_ de _TOTAL_",
+
+                zeroRecords:
+                "No hay registros",
+
+                paginate:{
+
+                    first:"Primero",
+
+                    last:"Último",
+
+                    next:"Siguiente",
+
+                    previous:"Anterior"
+
+                }
+
+            }
+
+        });
+
+
+    }
+
+
+
+    // limpiar sin destruir filtros
+    tabla.clear();
+
+
+
+    votos.forEach(v=>{
+
+
+        let candidato="Sin candidato";
+        let partido="Sin partido";
+
+
+        /*
+          Supabase puede devolver:
+
+          candidatos:{
+             nombre:"",
+             partido:""
+          }
+
+          o
+
+          candidatos:[
+             {
+              nombre:"",
+              partido:""
+             }
+          ]
+
+        */
+
+
+        if(v.candidatos){
+
+
+            if(Array.isArray(v.candidatos)){
+
+
+                candidato =
+                v.candidatos[0]?.nombre || "Sin candidato";
+
+
+                partido =
+                v.candidatos[0]?.partido || "Sin partido";
+
+
+            }else{
+
+
+                candidato =
+                v.candidatos.nombre || "Sin candidato";
+
+
+                partido =
+                v.candidatos.partido || "Sin partido";
+
+
+            }
+
+
+        }
+
+
+
+        tabla.row.add([
+
+
+            v.id,
+
+
+            new Date(v.fecha_registro)
+            .toLocaleString("es-PE"),
+
+
+            v.zona || "Sin zona",
+
+
+            v.dni || "Anónimo",
+
+
+            candidato,
+
+
+            partido
+
+
+        ]);
+
+
+
+    });
+
+
+
+    tabla.draw(false);
+
 
 }
 
-mostrarBienvenida();
+
+// =============================
+// EXPORTAR EXCEL
+// =============================
+
+
+document
+.getElementById("btnExcel")
+.addEventListener("click",()=>{
+
+
+let tablaHTML =
+document
+.getElementById("tablaVotos");
+
+
+
+let wb =
+XLSX.utils.table_to_book(
+tablaHTML
+);
+
+
+
+XLSX.writeFile(
+wb,
+"votos_elecciones_2026.xlsx"
+);
+
+
+
+});
+
+
+
+
+// =============================
+// EXPORTAR PDF
+// =============================
+
+
+document
+.getElementById("btnPDF")
+.addEventListener("click",()=>{
+
+
+const {jsPDF}=window.jspdf;
+
+
+const doc =
+new jsPDF();
+
+
+
+doc.text(
+"Resultados Elecciones 2026",
+14,
+15
+);
+
+
+
+doc.autoTable({
+
+html:"#tablaVotos",
+
+startY:25
+
+});
+
+
+
+doc.save(
+"votos_elecciones_2026.pdf"
+);
+
+
+
+});
+
+
+
+
+// =============================
+// ACTUALIZAR MANUAL
+// =============================
+
+
+document
+.getElementById("btnActualizar")
+.addEventListener(
+"click",
+()=>{
+
+
+cargarDashboard();
+
+
+});
+
+
+
+
+// =============================
+// CERRAR SESIÓN
+// =============================
+
+
+document
+.getElementById("btnSalir")
+.addEventListener(
+"click",
+()=>{
+
+
+localStorage.removeItem(
+"token"
+);
+
+
+localStorage.removeItem(
+"nombre"
+);
+
+
+
+window.location.href=
+"index.html";
+
+
+});
+
+
+
+
+// =============================
+// ACTUALIZACION AUTOMATICA
+// =============================
+
+
+// cada 30 segundos
+
+
+setInterval(()=>{
+
+
+cargarDashboard();
+
+
+
+},30000);
+
+
+
+// Primera carga
+
+cargarDashboard();
+
+
+
+});

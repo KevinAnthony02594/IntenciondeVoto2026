@@ -10,37 +10,37 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
-<div class="modal-admin hidden" id="adminModal">
 
-    <div class="modal-admin-content">
-
-        <h3>Acceso Administrativo</h3>
-
-        <input
-            type="password"
-            id="adminDni"
-            maxlength="8"
-            placeholder="Ingrese DNI">
-
-        <p id="adminError"></p>
-
-        <div class="mt-3">
-
-            <button id="btnAdminLogin">
-                Ingresar
-            </button>
-
-            <button id="btnCerrarAdmin">
-                Cancelar
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
 <body>
+  <div class="modal-admin hidden" id="adminModal">
 
+      <div class="modal-admin-content">
+
+          <h3>Acceso Administrativo</h3>
+
+          <input
+              type="password"
+              id="adminDni"
+              maxlength="8"
+              placeholder="Ingrese DNI">
+
+          <p id="adminError"></p>
+
+          <div class="mt-3">
+
+              <button id="btnAdminLogin">
+                  Ingresar
+              </button>
+
+              <button id="btnCerrarAdmin">
+                  Cancelar
+              </button>
+
+          </div>
+
+      </div>
+
+  </div>
   <div class="stage">
     <p class="eyebrow">Padrón electoral · 2026</p>
     <h1>Elecciones Ciudadanas</h1>
@@ -75,7 +75,7 @@
           <fieldset id="candidatos">
               <div class="ticket" style="--tab:#c0392b">
                 <input type="radio" name="voto" id="c1"
-                    value="Jorge Vejorano - Avanza país">
+                    value="1">
                 <label for="c1">
                     <span class="tab"></span>
                     <img
@@ -94,7 +94,7 @@
             </div>
 
             <div class="ticket" style="--tab:#e08e45">
-              <input type="radio" name="voto" id="c2" value="Roberto de la cruz - Alianza por el progreso">
+              <input type="radio" name="voto" id="c2" value="2">
               <label for="c2">
                 <span class="tab"></span>
                 <img
@@ -109,7 +109,7 @@
             </div>
 
             <div class="ticket" style="--tab:#2e8b57">
-              <input type="radio" name="voto" id="c3" value="Jordan Piminchomo - Un camino diferente">
+              <input type="radio" name="voto" id="c3" value="3">
               <label for="c3">
                 <span class="tab"></span>
                 <img
@@ -124,7 +124,7 @@
             </div> 
 
             <div class="ticket" style="--tab:#2c5f8a">
-              <input type="radio" name="voto" id="c4" value="Jose Ruis Vega - Fuerza popular">
+              <input type="radio" name="voto" id="c4" value="4">
               <label for="c4">
                 <span class="tab"></span>
                 <img
@@ -139,7 +139,7 @@
             </div>
 
             <div class="ticket" style="--tab:#4c7f8f">
-              <input type="radio" name="voto" id="c5" value="Victor Cruz Bubio - Partido aprista peruano">
+              <input type="radio" name="voto" id="c5" value="5">
               <label for="c5">
                 <span class="tab"></span>
                 <img
@@ -168,7 +168,7 @@
         Votación © 2026
     </footer> -->
 
-    <footer class="note" >
+    <footer class="note" id="admin-access" >
         Votación © 2026
     </footer>
   </div>

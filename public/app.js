@@ -140,7 +140,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const dni = dniHidden.value.trim(); // puede ir vacío: el DNI es opcional
     const zona = zonaHidden.value;
-    const votoInput = form.querySelector('input[name="voto"]:checked');
+    const votoInput = form.querySelector(
+        'input[name="voto"]:checked'
+    );
+
+
+    if (!votoInput) {
+
+        showMessage(
+            'Debe seleccionar un candidato.',
+            'error'
+        );
+
+        return;
+
+    }
+
+
+    const candidato_id = votoInput.value;
     const voto = votoInput ? votoInput.value : '';
 
     if (!voto) {
@@ -160,13 +177,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('/api/votar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dni: dni || null, voto, zona })
+        body:JSON.stringify({
+            dni:dni||null,
+            candidato_id:candidato_id,
+            zona
+        })
       });
       const data = await response.json();
 
       if (response.ok) {
         showMessage(data.message, 'success');
-        form.querySelectorAll('input[name="voto"]').forEach(i => i.checked = false);
+        form.querySelectorAll('input[name="candidato"]').forEach(i => i.checked = false);
       } else {
         showMessage(data.message, 'error');
       }
@@ -187,6 +208,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const adminAccess = document.getElementById("admin-access");
 
+if(adminAccess){
+    adminAccess.addEventListener("click",()=>{
+        adminModal.classList.remove("hidden");
+    });
+}
+
 const adminModal = document.getElementById("adminModal");
 
 const btnCerrarAdmin = document.getElementById("btnCerrarAdmin");
@@ -199,7 +226,7 @@ adminAccess.addEventListener("click", () => {
 
 });
 
-btnCerrarAdmin.addEventListener("click", () => {
+btnCerrarAdmin.addEventListener("click",()=>{
 
     adminModal.classList.add("hidden");
 
