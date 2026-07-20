@@ -232,39 +232,59 @@ btnCerrarAdmin.addEventListener("click",()=>{
 
 });
 
-btnAdminLogin.addEventListener("click", async () => {
+btnAdminLogin.addEventListener("click",async()=>{
 
-    const dni = document.getElementById("adminDni").value.trim();
+const dni=
 
-    const response = await fetch("/api/admin/login", {
+document.getElementById("adminDni").value.trim();
 
-        method:"POST",
+const password=
 
-        headers:{
-            "Content-Type":"application/json"
-        },
+document.getElementById("adminPassword").value;
 
-        body:JSON.stringify({
-            dni
-        })
 
-    });
+const response=
 
-    const data = await response.json();
+await fetch("/api/admin/login",{
 
-    if(!response.ok){
+method:"POST",
 
-        document.getElementById("adminError").innerHTML =
-            data.message;
+headers:{
 
-        return;
+"Content-Type":"application/json"
 
-    }
+},
 
-    localStorage.setItem("token",data.token);
+body:JSON.stringify({
 
-    localStorage.setItem("nombre",data.nombre);
+dni,
+password
 
-    window.location.href="dashboard.html";
+})
+
+});
+
+
+const data=
+
+await response.json();
+
+
+if(!response.ok){
+
+document.getElementById("adminError").innerHTML=
+
+data.message;
+
+return;
+
+}
+
+
+localStorage.setItem("token",data.token);
+
+localStorage.setItem("nombre",data.nombre);
+
+window.location.href="dashboard.html";
 
 });

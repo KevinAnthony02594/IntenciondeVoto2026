@@ -12,35 +12,73 @@
 </head>
 
 <body>
-  <div class="modal-admin hidden" id="adminModal">
 
-      <div class="modal-admin-content">
+<!-- Modal Login Administrador -->
+<div class="modal-admin hidden" id="adminModal">
 
-          <h3>Acceso Administrativo</h3>
+    <div class="modal-admin-content">
 
-          <input
-              type="password"
-              id="adminDni"
-              maxlength="8"
-              placeholder="Ingrese DNI">
+        <div class="admin-header">
 
-          <p id="adminError"></p>
+            <div class="admin-icon">
+                🔐
+            </div>
 
-          <div class="mt-3">
+            <h2>Panel Administrativo</h2>
 
-              <button id="btnAdminLogin">
-                  Ingresar
-              </button>
+            <p>
+                Ingrese sus credenciales para acceder al Dashboard
+            </p>
 
-              <button id="btnCerrarAdmin">
-                  Cancelar
-              </button>
+        </div>
 
-          </div>
+        <div class="form-group">
 
-      </div>
+            <label>DNI</label>
 
-  </div>
+            <input
+                type="text"
+                id="adminDni"
+                maxlength="8"
+                placeholder="Ingrese su DNI">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Contraseña</label>
+
+            <input
+                type="password"
+                id="adminPassword"
+                placeholder="Ingrese su contraseña">
+
+        </div>
+
+        <p id="adminError" class="admin-error"></p>
+
+        <div class="admin-buttons">
+
+            <button id="btnAdminLogin" class="btn-login">
+
+                <i class="bi bi-box-arrow-in-right"></i>
+
+                Ingresar
+
+            </button>
+
+            <button id="btnCerrarAdmin" class="btn-cancel">
+
+                Cancelar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
   <div class="stage">
     <p class="eyebrow">Padrón electoral · 2026</p>
     <h1>Simulacro votacion</h1>
